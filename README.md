@@ -2,24 +2,34 @@
 
 A multi-language audio tool designed for language learners to memorize vocabulary.
 
-## ✨ Features
+Traditional TTS only read words in one language, forcing you to stare at a screen or a book. Language Meaning TTS bridges the gap by creating an instant, sequential audio reflex in your brain.
 
-* **Unlimited use:** This TTS tool runs 100% offline and does not consume any online tokens or data. You can generate and play the audio as many times as you want for free.
-* **Dual drop-down lists for language selection:** You can pick any two installed languages on your system via dropdown lists to match them together.
-* **Combined audio output:** It generates a single, combined audio file matching the foreign language word directly with its meaning in your familiar language for continuous listening.
+## 🎯 Core Concept & The Brain Reflex Method
 
-### Examples:
-* **An English speaker learning French:**
-  * "dream, le rêve"
-  * "escape, s'échapper"
-  * "finish, finir"
+Language Meaning TTS creates an audio reflex by playing your familiar language first, followed immediately by the foreign pronunciation. 
 
-* **A Spanish speaker learning Italian:**
-  * "sueño, il sogno"
-  * "escapar, scappare"
-  * "terminar, finire"
+### 🎧 How the Audio Flow Works (Examples)
 
----
+* **English speaker learning French:**
+  > 🔊`"abandon"` ➔ ⏱️ *Pause* ➔ `"abandonner, renoncer"`<br>
+  > 🔊`"escape"` ➔ ⏱️ *Pause* ➔ `"s'echapper, fuir"`<br>
+  > 🔊`"finish"` ➔ ⏱️ *Pause* ➔ `"finir, achever"`
+
+* **Spanish speaker learning Italian:**
+  > 🔊 `"sueño"` ➔ ⏱️ *Pause* ➔ `"il sogno"`<br>
+  > 🔊 `"escapar"` ➔ ⏱️ *Pause* ➔ `"scappare"`<br>
+  > 🔊 `"terminar"` ➔ ⏱️ *Pause* ➔ `"finire"`
+
+### ⚙️ Practical Design & Workflow
+1. **Audio-First Learning:** Listen to your vocabulary anytime, anywhere without staring at a screen.
+2. **Instant Mapping:** Hear the meaning right before the foreign word to link them together.
+3. **Continuous Playback:** Converts your text list into a single audio file for non-stop listening.
+
+## ✨ Technical Features
+
+* **100% Offline & Free:** This tool runs completely on your local system. It consumes zero online tokens or internet data.
+* **Any Two Languages:** Dual drop-down lists let you pick and combine any two languages installed on your operating system.
+* **Easy Setup:** Just run the EXE, copy your vocabulary from your list, select your voices, and generate your custom audio instantly.
 
 ## 🌐 System Voice Setup & Troubleshooting
 
@@ -31,8 +41,6 @@ The program uses the built-in voice engines already installed on your operating 
 3. Under **Preferred languages**, click **Add a language**.
 4. Search for your target language (e.g., French, Spanish, German) and make sure **Text-to-speech** is enabled.
 5. Click **Install**, then restart the application to automatically load the new voice.
-
----
 
 ## 📥 How to Use (Choose Your Option)
 
