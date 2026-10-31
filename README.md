@@ -2,7 +2,7 @@
 
 A multi-language audio tool designed for language learners to memorize vocabulary.
 
-Traditional TTS only read words in one language, forcing you to stare at a screen or a book. Language Meaning TTS bridges the gap by creating an instant, sequential audio reflex in your brain.
+Traditional TTS only reads words in one language, forcing you to stare at a screen or a book. Language Meaning TTS bridges the gap by creating an instant, sequential audio reflex in your brain.
 
 ## 🎯 Core Concept & The Brain Reflex Method
 
@@ -25,7 +25,7 @@ Language Meaning TTS creates an audio reflex by playing your familiar language f
 2. **Instant Mapping:** Hear the meaning right before the foreign word to link them together.
 3. **Continuous Playback:** Converts your text list into a single audio file for non-stop listening.
 
-## ✨ Technical Features
+## ✨ Features
 
 * **100% Offline & Free:** This tool runs completely on your local system. It consumes zero online tokens or internet data.
 * **Any Two Languages:** Dual drop-down lists let you pick and combine any two languages installed on your operating system.
