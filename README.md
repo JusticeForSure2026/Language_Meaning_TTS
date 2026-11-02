@@ -48,9 +48,9 @@ The program uses the built-in voice engines already installed on your operating 
 ## 📥 How to Use (Choose Your Option)
 
 ### Option 1: If you just want to study by yourself
-You do not need to download the full source code. Simply <mark>**📥 download the "Language Meaning TTS.exe" directly**</mark> under the <mark>📂 "executable" folder</mark> and run it directly. 
+* 📥 Download the "Language Meaning TTS.exe" directly** under the 📂 "executable" folder and run it directly. 
 
-> ℹ️ **Note:** Currently optimized and fully tested for Windows. The macOS version remains untested.
+> ℹ️ **Note:** Currently fully tested for Windows. The macOS version remains untested.
 
 ### Option 2: If you want to modify or compile the program 
 
