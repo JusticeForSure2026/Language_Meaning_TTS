@@ -5,7 +5,7 @@ import pythoncom
 import pyttsx3
 from PySide6.QtWidgets import (
     QApplication, QWidget, QTextEdit, QVBoxLayout, QPushButton, QLabel, QComboBox, QHBoxLayout, QLineEdit, QSizePolicy,
-    QSpinBox
+    QSpinBox, QCheckBox
 )
 from PySide6.QtCore import Signal, QObject
 from PySide6.QtGui import QTextCursor, QColor, QIcon
@@ -34,6 +34,8 @@ class TTSWorker(threading.Thread):
         self.app = app
         self.voice_id1 = ""
         self.voice_id2 = ""
+
+        self.single_language_only = False
 
         self.repetition_times1 = 1
         self.repetition_times2 = 1
@@ -82,20 +84,21 @@ class TTSWorker(threading.Thread):
                 while (time.time() - start_time) < self.pause1:
                     counter += 1
 
-            self.app.signals.lineChanged.emit(self.app.current_index, "right")
+            if not self.single_language_only:
+                self.app.signals.lineChanged.emit(self.app.current_index, "right")
 
-            for i in range(self.repetition_times2):
-                self.app.engine = pyttsx3.init()
-                self.app.engine.setProperty('voice', self.voice_id2)
-                self.app.engine.setProperty('rate', self.app.current_speed)
-                self.app.engine.say(self.app.text2[self.app.current_index])
-                self.app.engine.runAndWait()
-                self.app.engine = None
+                for i in range(self.repetition_times2):
+                    self.app.engine = pyttsx3.init()
+                    self.app.engine.setProperty('voice', self.voice_id2)
+                    self.app.engine.setProperty('rate', self.app.current_speed)
+                    self.app.engine.say(self.app.text2[self.app.current_index])
+                    self.app.engine.runAndWait()
+                    self.app.engine = None
 
-                counter = 0
-                start_time = time.time()
-                while (time.time() - start_time) < self.pause2:
-                    counter += 1
+                    counter = 0
+                    start_time = time.time()
+                    while (time.time() - start_time) < self.pause2:
+                        counter += 1
 
             self.app.current_index += 1
 
@@ -107,24 +110,38 @@ class TTSApp(QWidget):
         super().__init__()
 
         self.setWindowTitle("Language Meaning TTS")
-        self.resize(800, 600)
+        self.resize(960, 640)
 
         self.voices = pyttsx3.init().getProperty('voices')
         self.voice_string_list = [item.id for item in self.voices]
         self.voice_name_list = [item.name for item in self.voices]
 
-        # self.voice_name_list = None
-
         self.layout = QVBoxLayout(self)
 
+        description_label = QLabel(
+            "<b>When outputting audio files, the system will generate:</b><br>"
+            "• <code>FirstVoiceTemporary12345</code> folder<br>"
+            "• <code>SecondVoiceTemporary12345</code> folder<br>"
+            "• <code>SilentTemporary12345.wav</code><br>"
+            "<font color='#2980B9'><b>Note:</b> Avoid renaming any of your personal files to the names above "
+            "to prevent your personal data from being deleted.</font>"
+        )
+        self.layout.addWidget(description_label)
+
+        self.single_language_checkbox = QCheckBox("Single language only")
+        self.single_language_checkbox.stateChanged.connect(self.on_single_language_checkbox_changed)
+        self.layout.addWidget(self.single_language_checkbox)
+
         language_global_layout = QHBoxLayout()
+        language_global_layout.setContentsMargins(0, 4, 0, 0)
 
         # Language 1 voice selection
         language_vertical_layout1 = QVBoxLayout()
+        language_vertical_layout1.setContentsMargins(0, 0, 0, 10)
 
         voice_layout = QHBoxLayout()
-        self.voice_label = QLabel("First Voice:")
-        voice_layout.addWidget(self.voice_label)
+        voice_label = QLabel("First Voice:")
+        voice_layout.addWidget(voice_label)
 
         self.voice_combo1 = QComboBox()
 
@@ -146,8 +163,8 @@ class TTSApp(QWidget):
 
         repetition_layout1 = QHBoxLayout()
 
-        self.repetition_label1 = QLabel("Repeat: ")
-        repetition_layout1.addWidget(self.repetition_label1)
+        repetition_label1 = QLabel("Repeat: ")
+        repetition_layout1.addWidget(repetition_label1)
 
         self.repetition_spinbox1 = QSpinBox()
         self.repetition_spinbox1.setRange(1, 100)
@@ -155,23 +172,23 @@ class TTSApp(QWidget):
         self.repetition_spinbox1.setFixedWidth(100)
         repetition_layout1.addWidget(self.repetition_spinbox1)
 
-        self.repetition_label2 = QLabel(" times")
-        repetition_layout1.addWidget(self.repetition_label2)
+        repetition_label2 = QLabel(" times")
+        repetition_layout1.addWidget(repetition_label2)
 
         repetition_layout1.addStretch(1)
         language_vertical_layout1.addLayout(repetition_layout1)
 
         pause_layout1 = QHBoxLayout()
 
-        self.repetition_label3 = QLabel("Pause: ")
-        pause_layout1.addWidget(self.repetition_label3)
+        repetition_label3 = QLabel("Pause: ")
+        pause_layout1.addWidget(repetition_label3)
 
         self.pause_edit1 = QLineEdit("0.0")
         self.pause_edit1.textChanged.connect(self.update_pause1)
         pause_layout1.addWidget(self.pause_edit1)
 
-        self.repetition_label4 = QLabel(" seconds - each line")
-        pause_layout1.addWidget(self.repetition_label4)
+        repetition_label4 = QLabel(" seconds - each line")
+        pause_layout1.addWidget(repetition_label4)
 
         pause_layout1.addStretch(1)
         language_vertical_layout1.addLayout(pause_layout1)
@@ -184,14 +201,14 @@ class TTSApp(QWidget):
 
         language_global_layout.addLayout(language_vertical_layout1)
 
-        language_global_layout.addSpacing(10)
-
         # Language 2 voice selection
-        language_vertical_layout2 = QVBoxLayout()
+        self.language_vertical_layout_widget2 = QWidget()
+        language_vertical_layout2 = QVBoxLayout(self.language_vertical_layout_widget2)
+        language_vertical_layout2.setContentsMargins(10, 0, 0, 10)
 
         voice_layout = QHBoxLayout()
-        self.voice_label = QLabel("Second Voice:")
-        voice_layout.addWidget(self.voice_label)
+        voice_label = QLabel("Second Voice:")
+        voice_layout.addWidget(voice_label)
 
         self.voice_combo2 = QComboBox()
 
@@ -213,8 +230,8 @@ class TTSApp(QWidget):
 
         repetition_layout2 = QHBoxLayout()
 
-        self.repetition_label5 = QLabel("Repeat: ")
-        repetition_layout2.addWidget(self.repetition_label5)
+        repetition_label5 = QLabel("Repeat: ")
+        repetition_layout2.addWidget(repetition_label5)
 
         self.repetition_spinbox2 = QSpinBox()
         self.repetition_spinbox2.setRange(1, 100)
@@ -222,23 +239,23 @@ class TTSApp(QWidget):
         self.repetition_spinbox2.setFixedWidth(100)
         repetition_layout2.addWidget(self.repetition_spinbox2)
 
-        self.repetition_label6 = QLabel(" times")
-        repetition_layout2.addWidget(self.repetition_label6)
+        repetition_label6 = QLabel(" times")
+        repetition_layout2.addWidget(repetition_label6)
 
         repetition_layout2.addStretch(1)
         language_vertical_layout2.addLayout(repetition_layout2)
 
         pause_layout2 = QHBoxLayout()
 
-        self.repetition_label7 = QLabel("Pause: ")
-        pause_layout2.addWidget(self.repetition_label7)
+        repetition_label7 = QLabel("Pause: ")
+        pause_layout2.addWidget(repetition_label7)
 
         self.pause_edit2 = QLineEdit("0.0")
         self.pause_edit2.textChanged.connect(self.update_pause2)
         pause_layout2.addWidget(self.pause_edit2)
 
-        self.repetition_label8 = QLabel(" seconds - each line")
-        pause_layout2.addWidget(self.repetition_label8)
+        repetition_label8 = QLabel(" seconds - each line")
+        pause_layout2.addWidget(repetition_label8)
 
         pause_layout2.addStretch(1)
         language_vertical_layout2.addLayout(pause_layout2)
@@ -249,7 +266,7 @@ class TTSApp(QWidget):
         self.original_background2 = self.text_edit2.palette().base().color()
         self.text_edit2.textChanged.connect(self.text_changed)
 
-        language_global_layout.addLayout(language_vertical_layout2)
+        language_global_layout.addWidget(self.language_vertical_layout_widget2)
 
         self.layout.addLayout(language_global_layout)
 
@@ -285,6 +302,12 @@ class TTSApp(QWidget):
         self.lines = []
         self.text_modified = True
         self.current_index = 0
+
+    def on_single_language_checkbox_changed(self, state):
+        if state == 2:
+            self.language_vertical_layout_widget2.hide()
+        else:
+            self.language_vertical_layout_widget2.show()
 
     def on_voice_change(self, index):
         if self.worker:
@@ -338,6 +361,8 @@ class TTSApp(QWidget):
 
             self.worker.voice_id1 = self.voice_string_list[self.voice_combo1.currentIndex()]
             self.worker.voice_id2 = self.voice_string_list[self.voice_combo2.currentIndex()]
+
+            self.worker.single_language_only = self.single_language_checkbox.isChecked()
 
             self.worker.repetition_times1 = self.repetition_spinbox1.value()
             self.worker.repetition_times2 = self.repetition_spinbox2.value()
@@ -469,44 +494,60 @@ class TTSApp(QWidget):
 
             repetition_count1 = int(pause_duration1 / 0.1)
 
-            # Calculate the time of pause 2
-            pause_duration2 = 0.0
-            try:
-                pause_duration2 = round(float(self.pause_edit2.text()), 1)
-            except ValueError:
+            if self.single_language_checkbox.isChecked():
+                for idx, f_line in enumerate(text1_lines, 1):
+                    if f_line.strip():
+                        for index in range(self.repetition_spinbox1.value()):
+                            f_wav = os.path.join(dir1, f"F{idx}_{index}.wav")
+                            engine_f = pyttsx3.init()
+                            engine_f.setProperty("voice", voice_id1)
+                            engine_f.save_to_file(f_line, f_wav)
+                            engine_f.runAndWait()
+                            engine_f.stop()
+                            del engine_f
+                            wav_files.append(f_wav)
+
+                            for i in range(repetition_count1):
+                                wav_files.append(silent_01s_path)
+            else:
+                # Calculate the time of pause 2
                 pause_duration2 = 0.0
+                try:
+                    pause_duration2 = round(float(self.pause_edit2.text()), 1)
+                except ValueError:
+                    pause_duration2 = 0.0
 
-            repetition_count2 = int(pause_duration2 / 0.1)
+                repetition_count2 = int(pause_duration2 / 0.1)
 
-            for idx, (f_line, c_line) in enumerate(zip(text1_lines, text2_lines), 1):
-                if f_line.strip():
+                for idx, (f_line, c_line) in enumerate(zip(text1_lines, text2_lines), 1):
+                    if f_line.strip():
 
-                    for index in range(self.repetition_spinbox1.value()):
-                        f_wav = os.path.join(dir1, f"F{idx}_{index}.wav")
-                        engine_f = pyttsx3.init()
-                        engine_f.setProperty("voice", voice_id1)
-                        engine_f.save_to_file(f_line, f_wav)
-                        engine_f.runAndWait()
-                        engine_f.stop()
-                        del engine_f
-                        wav_files.append(f_wav)
+                        for index in range(self.repetition_spinbox1.value()):
+                            f_wav = os.path.join(dir1, f"F{idx}_{index}.wav")
+                            engine_f = pyttsx3.init()
+                            engine_f.setProperty("voice", voice_id1)
+                            engine_f.save_to_file(f_line, f_wav)
+                            engine_f.runAndWait()
+                            engine_f.stop()
+                            del engine_f
+                            wav_files.append(f_wav)
 
-                        for i in range(repetition_count1):
-                            wav_files.append(silent_01s_path)
+                            for i in range(repetition_count1):
+                                wav_files.append(silent_01s_path)
 
-                if c_line.strip():
-                    for index in range(self.repetition_spinbox2.value()):
-                        s_wav = os.path.join(dir2, f"S{idx}_{index}.wav")
-                        engine_c = pyttsx3.init()
-                        engine_c.setProperty("voice", voice_id2)
-                        engine_c.save_to_file(c_line, s_wav)
-                        engine_c.runAndWait()
-                        engine_c.stop()
-                        del engine_c
-                        wav_files.append(s_wav)
+                    if c_line.strip():
+                        for index in range(self.repetition_spinbox2.value()):
+                            s_wav = os.path.join(dir2, f"S{idx}_{index}.wav")
+                            engine_c = pyttsx3.init()
+                            engine_c.setProperty("voice", voice_id2)
+                            engine_c.save_to_file(c_line, s_wav)
+                            engine_c.runAndWait()
+                            engine_c.stop()
+                            del engine_c
+                            wav_files.append(s_wav)
 
-                        for i in range(repetition_count2):
-                            wav_files.append(silent_01s_path)
+                            for i in range(repetition_count2):
+                                wav_files.append(silent_01s_path)
 
             if not wav_files:
                 return
@@ -537,9 +578,9 @@ class TTSApp(QWidget):
                 ffmpeg_path = os.path.join(base_path, "ffmpeg-8.0-essentials_build", "bin", "ffmpeg")
 
             try:
-                speed_val = float(self.speed_edit.text())
+                speed_value = float(self.speed_edit.text())
             except ValueError:
-                speed_val = 1.0
+                speed_value = 1.0
 
             output_ogg = os.path.join(current_dir, "Combined.ogg")
 
@@ -547,7 +588,7 @@ class TTSApp(QWidget):
                 ffmpeg_path,
                 "-y",
                 "-i", combined_path,
-                "-filter:a", f"atempo={speed_val}",
+                "-filter:a", f"atempo={speed_value}",
                 output_ogg
             ])
 
